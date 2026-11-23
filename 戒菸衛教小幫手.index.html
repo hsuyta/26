@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0e7c66">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>戒菸衛教小幫手</title>
+<style>
+  :root{
+    --main:#0e7c66; --main-dk:#0a5f4e; --main-lt:#e6f4f0;
+    --accent:#f59e0b; --danger:#e2574c;
+    --bg:#f2f7f5; --card:#ffffff; --text:#22343a; --muted:#6b8188;
+    --radius:18px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif;
+    background:var(--bg); color:var(--text);
+    padding-bottom:calc(76px + env(safe-area-inset-bottom));
+  }
+  header{
+    background:linear-gradient(135deg,var(--main),#12a084);
+    color:#fff; padding:22px 20px 26px; border-radius:0 0 26px 26px;
+    box-shadow:0 4px 14px rgba(14,124,102,.25);
+  }
+  header h1{font-size:22px;letter-spacing:1px}
+  header p{font-size:13px;opacity:.9;margin-top:6px}
+  #quitDays{margin-top:12px;background:rgba(255,255,255,.18);display:inline-block;padding:8px 16px;border-radius:999px;font-size:14px}
+  main{padding:16px 14px}
+  section{display:none;animation:fade .25s ease}
+  section.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;
+    box-shadow:0 2px 8px rgba(34,52,58,.06)}
+  .card h2{font-size:17px;color:var(--main-dk);display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .card h2 .ico{width:30px;height:30px;border-radius:9px;background:var(--main-lt);
+    display:flex;align-items:center;justify-content:center;font-size:16px}
+  .card p,.card li{font-size:14.5px;line-height:1.75;color:var(--text)}
+  .card ul{padding-left:20px}
+  .num{background:var(--main);color:#fff;font-size:12px;padding:2px 9px;border-radius:999px;margin-right:6px}
+  .tip{background:var(--main-lt);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--main-dk);margin-top:10px}
+
+  .benefit{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+  .benefit .em{font-size:26px;flex-shrink:0}
+  .benefit b{color:var(--main-dk);font-size:15px}
+  .benefit span{display:block;font-size:13.5px;color:var(--muted);line-height:1.6}
+
+  .warn-item{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+  .warn-item .dot{width:34px;height:34px;border-radius:50%;background:#fdeae8;color:var(--danger);
+    display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0;font-size:14px}
+  .warn-item b{font-size:15px;color:#a33830}
+  .warn-item span{display:block;font-size:13.5px;color:var(--muted);line-height:1.6}
+
+  input[type="date"],input[type="number"],select,input[type="text"]{
+    width:100%;padding:12px 14px;border:1.5px solid #d7e6e1;border-radius:12px;
+    font-size:15px;background:#fbfdfc;color:var(--text);-webkit-appearance:none;appearance:none;
+  }
+  label{font-size:13.5px;color:var(--muted);display:block;margin:12px 0 6px}
+  .btn{
+    display:block;width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;font-weight:bold;
+    background:var(--main);color:#fff;margin-top:16px;box-shadow:0 3px 10px rgba(14,124,102,.3);cursor:pointer;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:#fff;color:var(--main);border:1.5px solid var(--main);box-shadow:none}
+  .btn.warn{background:var(--danger)}
+
+  .plan-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed #dde}
+  .plan-step:last-child{border-bottom:none}
+  .plan-step .n{width:28px;height:28px;border-radius:50%;background:var(--main);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;flex-shrink:0}
+  .plan-step b{font-size:14.5px}
+  .plan-step span{display:block;font-size:13px;color:var(--muted);line-height:1.6}
+
+  .log-item{background:#fbfdfc;border:1.5px solid #e3efeb;border-radius:12px;padding:10px 14px;
+    margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:14px}
+  .log-item small{color:var(--muted);display:block}
+  .del{color:var(--danger);font-size:13px;padding:6px 10px;border-radius:8px;background:#fdeae8}
+  .empty{text-align:center;color:var(--muted);font-size:13.5px;padding:18px 0}
+
+  .stat{display:flex;gap:10px;margin-bottom:14px}
+  .stat .box{flex:1;background:var(--card);border-radius:14px;padding:12px;text-align:center;
+    box-shadow:0 2px 8px rgba(34,52,58,.06)}
+  .stat .box b{font-size:22px;color:var(--main-dk);display:block}
+  .stat .box span{font-size:12px;color:var(--muted)}
+  .money{color:var(--accent)!important}
+
+  .crave-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .crave-btns button{padding:10px 14px;border-radius:999px;border:1.5px solid var(--main);
+    background:#fff;color:var(--main);font-size:13.5px;cursor:pointer}
+  .crave-btns button:active{background:var(--main-lt)}
+
+  .quiz-q{font-size:15px;font-weight:bold;margin-bottom:10px;line-height:1.6}
+  .opt{display:block;width:100%;text-align:left;padding:12px 14px;margin-bottom:8px;
+    border:1.5px solid #d7e6e1;border-radius:12px;background:#fff;font-size:14px;line-height:1.5;cursor:pointer}
+  .opt.correct{background:#e2f5ec;border-color:var(--main);color:var(--main-dk);font-weight:bold}
+  .opt.wrong{background:#fdeae8;border-color:var(--danger);color:#a33830}
+  .opt:disabled{cursor:default}
+  #quizResult{text-align:center;padding:10px 0}
+  #quizResult .big{font-size:40px}
+  #quizResult b{font-size:18px;color:var(--main-dk)}
+
+  nav{
+    position:fixed;bottom:0;left:0;right:0;height:calc(66px + env(safe-area-inset-bottom));
+    background:#fff;display:flex;box-shadow:0 -3px 12px rgba(34,52,58,.08);z-index:10;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  nav button{flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:3px;font-size:11px;color:var(--muted);cursor:pointer}
+  nav button .ic{font-size:21px}
+  nav button.on{color:var(--main);font-weight:bold}
+</style>
+</head>
+<body>
+<header>
+  <h1>🚭 戒菸衛教小幫手</h1>
+  <p>依衛教目標設計：好處・危害・戒菸計畫</p>
+  <div id="quitDays">尚未設定戒菸日 — 點「我的計畫」開始</div>
+</header>
+
+<main>
+<!-- ================= 首頁：戒菸好處 ================= -->
+<section id="home" class="active">
+  <div class="card">
+    <h2><span class="ico">🌟</span>戒菸的三大好處</h2>
+    <div class="benefit"><div class="em">❤️</div><div><b>1. 預防心血管疾病</b><span>尼古丁使血管收縮、心跳加快、血壓上升。戒菸能降低心肌梗塞、中風與動脈硬化的風險。</span></div></div>
+    <div class="benefit"><div class="em">🫁</div><div><b>2. 預防肺癌、口腔癌、COPD</b><span>菸品含多種致癌物與焦油，會慢性刺激氣道造成咳嗽、呼吸困難。戒菸後肺功能逐漸改善。</span></div></div>
+    <div class="benefit"><div class="em">👨‍👩‍👧</div><div><b>3. 保護家人，避免二手及三手菸</b><span>二手菸增加家人罹患肺癌與心血管疾病的風險；三手菸殘留在衣物、家具上，對嬰幼兒危害更大。</span></div></div>
+    <div class="tip">💡 停菸 20 分鐘後血壓心跳開始下降，1 年後冠狀動脈疾病風險減半，越早戒越好！</div>
+  </div>
+  <div class="card">
+    <h2><span class="ico">💰</span>我的省錢小計算</h2>
+    <label>每天吸幾支菸？</label>
+    <input type="number" id="cigPerDay" min="1" placeholder="例如：20">
+    <label>一包菸多少錢？</label>
+    <input type="number" id="packPrice" min="1" placeholder="例如：125">
+    <button class="btn" onclick="calcSave()">計算一年可以省多少</button>
+    <div id="saveResult" class="tip" style="display:none"></div>
+  </div>
+</section>
+
+<!-- ================= 尼古丁危害 ================= -->
+<section id="harm">
+  <div class="card">
+    <h2><span class="ico">⚠️</span>尼古丁對人體的四大危害</h2>
+    <div class="warn-item"><div class="dot">1</div><div><b>成癮與依賴</b><span>尼古丁快速作用於腦部，產生心理與生理依賴，這就是「明明想戒卻戒不掉」的原因。</span></div></div>
+    <div class="warn-item"><div class="dot">2</div><div><b>心跳加快、血壓上升</b><span>刺激交感神經釋放腎上腺素，加重心臟負荷，長期易導致心血管疾病。</span></div></div>
+    <div class="warn-item"><div class="dot">3</div><div><b>戒斷症狀</b><span>停菸後可能出現焦慮、煩躁、注意力不集中、很想抽菸等症狀，通常數天至數週會逐漸緩解，別擔心！</span></div></div>
+    <div class="warn-item"><div class="dot">4</div><div><b>影響生育能力</b><span>男性：降低精蟲數量與活動力；女性：影響受孕，懷孕時更會傷害胎兒。</span></div></div>
+  </div>
+  <div class="card">
+    <h2><span class="ico">🆘</span>想抽菸的時候怎麼辦？</h2>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:6px">點一下，立即給你一個替代行動：</p>
+    <div class="crave-btns">
+      <button onclick="showCrave('🚰 慢慢喝一杯溫開水，深呼吸 5 次')">喝水深呼吸</button>
+      <button onclick="showCrave('🍬 嚼一顆無糖口香糖轉移注意力')">嚼無糖口香糖</button>
+      <button onclick="showCrave('🚶 出去散步 10 分鐘，換個環境')">出去散步</button>
+      <button onclick="showCrave('🧼 去刷牙或洗手，清新感會趕走菸癮')">刷牙洗手</button>
+      <button onclick="showCrave('📞 打給家人或戒菸專線 0800-636-363 聊聊天')">找人陪伴</button>
+      <button onclick="showCrave('🍊 吃點小黃瓜、紅蘿蔔條或無糖優格')">健康小點心</button>
+    </div>
+    <div id="craveResult" class="tip" style="display:none"></div>
+  </div>
+</section>
+
+<!-- ================= 我的計畫 ================= -->
+<section id="plan">
+  <div class="card">
+    <h2><span class="ico">📋</span>設計我的戒菸計畫</h2>
+    <div class="plan-step"><div class="n">1</div><div><b>訂定明確的戒菸日期</b><span>選一個有意義、壓力較小的日子，並預先告訴親友。</span></div></div>
+    <div class="plan-step"><div class="n">2</div><div><b>記錄每日吸菸量與想抽菸的情境</b><span>用下面的「吸菸日誌」，找出最容易破功的時刻。</span></div></div>
+    <div class="plan-step"><div class="n">3</div><div><b>建立替代行為</b><span>喝水、嚼無糖口香糖、散步……把抽菸的時間換成健康行動。</span></div></div>
+    <div class="plan-step"><div class="n">4</div><div><b>尋求家人支持或戒菸門診協助</b><span>告知家人你的計畫，並善用戒菸門診、戒菸專線 0800-636-363。</span></div></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="ico">📅</span>我的戒菸日</h2>
+    <label>選擇戒菸開始日期（建議 2 週內）</label>
+    <input type="date" id="quitDate">
+    <button class="btn" onclick="saveQuitDate()">儲存戒菸日</button>
+    <button class="btn ghost" onclick="clearQuitDate()">重設</button>
+  </div>
+
+  <div class="card">
+    <h2><span class="ico">✍️</span>吸菸日誌</h2>
+    <label>今日想抽菸的時間</label>
+    <input type="text" id="logWhen" placeholder="例如：飯後 7:30">
+    <label>當時的情境／心情</label>
+    <select id="logWhy">
+      <option>剛吃完飯</option><option>開車／通勤</option><option>工作壓力大</option>
+      <option>心情不好／焦慮</option><option>和朋友在一起</option><option>喝咖啡或酒</option><option>其他</option>
+    </select>
+    <label>這次有忍住了嗎？</label>
+    <select id="logOk"><option value="yes">✅ 忍住了，用了替代行為</option><option value="no">❌ 還是抽了</option></select>
+    <button class="btn" onclick="addLog()">加入日誌</button>
+    <div id="logList" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="ico">☎️</span>戒菸資源</h2>
+    <ul>
+      <li><b>戒菸專線：</b>0800-636-363（週一至週六 09:00–18:00，免費）</li>
+      <li><b>戒菸門診：</b>全台合約醫院，政府補助戒菸藥費</li>
+      <li><b>全國戒菸服務：</b>洽各地衛生局／國民健康署網站</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 小測驗 ================= -->
+<section id="quiz">
+  <div class="card">
+    <h2><span class="ico">📝</span>衛教小測驗</h2>
+    <p style="color:var(--muted);font-size:13px">檢查看看今天學會了嗎？共 3 題。</p>
+    <div id="quizBody"></div>
+  </div>
+</section>
+</main>
+
+<nav>
+  <button class="on" onclick="go('home',this)"><span class="ic">🌟</span>好處</button>
+  <button onclick="go('harm',this)"><span class="ic">⚠️</span>危害</button>
+  <button onclick="go('plan',this)"><span class="ic">📋</span>計畫</button>
+  <button onclick="go('quiz',this)"><span class="ic">📝</span>測驗</button>
+</nav>
+
+<script>
+/* ---------------- 導覽 ---------------- */
+function go(id, btn){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  window.scrollTo(0,0);
+}
+
+/* ---------------- 省錢計算 ---------------- */
+function calcSave(){
+  const n=+document.getElementById('cigPerDay').value, p=+document.getElementById('packPrice').value;
+  if(!n||!p) return;
+  const year=Math.round(n/20*p*365);
+  const el=document.getElementById('saveResult');
+  el.style.display='block';
+  el.innerHTML='💵 一年大約可省下 <b style="font-size:18px">$'+year.toLocaleString()+'</b> 元<br>= '+
+    (year>=40000?'一趟出國旅遊！✈️':year>=12000?'一部新手機！📱':'一個小金庫！🏦');
+}
+
+/* ---------------- 替代行為 ---------------- */
+function showCrave(t){
+  const el=document.getElementById('craveResult');
+  el.style.display='block'; el.innerHTML=t;
+}
+
+/* ---------------- 戒菸日 ---------------- */
+const K_QUIT='quitDate_v1';
+function saveQuitDate(){
+  const d=document.getElementById('quitDate').value;
+  if(!d){alert('請先選擇日期');return;}
+  localStorage.setItem(K_QUIT,d); showDays(); alert('已儲存！加油 💪');
+}
+function clearQuitDate(){
+  localStorage.removeItem(K_QUIT);
+  document.getElementById('quitDate').value=''; showDays();
+}
+function showDays(){
+  const d=localStorage.getItem(K_QUIT), el=document.getElementById('quitDays');
+  if(!d){el.textContent='尚未設定戒菸日 — 點「計畫」開始';return;}
+  const days=Math.floor((new Date().setHours(0,0,0,0)-new Date(d+'T00:00:00').getTime())/86400000);
+  el.innerHTML=days>=0 ? '🎉 戒菸第 <b>'+(days+1)+'</b> 天，繼續保持！'
+                       : '戒菸日：'+d+'（倒數 '+(-days)+' 天）';
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const d=localStorage.getItem(K_QUIT);
+  if(d) document.getElementById('quitDate').value=d;
+  showDays(); renderLog(); startQuiz();
+});
+
+/* ---------------- 吸菸日誌 ---------------- */
+const K_LOG='smokeLog_v1';
+function getLog(){return JSON.parse(localStorage.getItem(K_LOG)||'[]');}
+function addLog(){
+  const when=document.getElementById('logWhen').value.trim();
+  if(!when){alert('請填寫時間');return;}
+  const item={when, why:logWhy.value, ok:logOk.value, date:new Date().toLocaleDateString('zh-TW')};
+  const log=getLog(); log.unshift(item); localStorage.setItem(K_LOG,JSON.stringify(log));
+  logWhen.value=''; renderLog();
+}
+function delLog(i){
+  const log=getLog(); log.splice(i,1); localStorage.setItem(K_LOG,JSON.stringify(log)); renderLog();
+}
+function renderLog(){
+  const log=getLog(), el=document.getElementById('logList');
+  if(!log.length){el.innerHTML='<div class="empty">還沒有紀錄，開始記錄你的想抽菸時刻吧！</div>';return;}
+  el.innerHTML=log.map((l,i)=>
+    '<div class="log-item"><div><small>'+l.date+'・'+l.when+'・'+l.why+'</small>'+
+    (l.ok==='yes'?'✅ 忍住了':'❌ 抽了')+'</div><button class="del" onclick="delLog('+i+')">刪除</button></div>').join('');
+}
+
+/* ---------------- 測驗 ---------------- */
+const quiz=[
+  {q:'下列哪一個「不是」戒菸的好處？',
+   opts:['預防心血管疾病','預防肺癌、口腔癌、COPD','保護家人避免二手菸','戒菸可以增加尼古丁依賴'],a:3},
+  {q:'尼古丁會刺激交感神經，對身體造成什麼影響？',
+   opts:['心跳變慢、血壓下降','心跳加快、血壓上升','血糖立刻降低','視力變好'],a:1},
+  {q:'關於戒菸計畫，下列敘述何者正確？',
+   opts:['不用訂戒菸日期，隨時想戒就戒','遇到想抽菸時改用喝水、嚼無糖口香糖、散步','戒斷症狀表示戒菸失敗，應該停止','戒菸只要靠自己的意志，不需家人或門診協助'],a:1}
+];
+let qi=0, score=0;
+function startQuiz(){qi=0;score=0;renderQ();}
+function renderQ(){
+  const box=document.getElementById('quizBody');
+  if(qi>=quiz.length){
+    const full=score===quiz.length;
+    box.innerHTML='<div id="quizResult"><div class="big">'+(full?'🏆':'👍')+'</div>'+
+      '<b>得分：'+score+' / '+quiz.length+'</b><p style="margin-top:8px;font-size:14px">'+
+      (full?'太棒了！三大衛教目標都學會了，開始執行你的戒菸計畫吧！💪'
+           :'很不錯！可以回到「好處」「危害」再複習一次喔 😊')+'</p>'+
+      '<button class="btn ghost" onclick="startQuiz()">重新測驗</button></div>';
+    return;
+  }
+  const q=quiz[qi];
+  box.innerHTML='<p style="color:var(--muted);font-size:12px;margin:8px 0 4px">第 '+(qi+1)+' / '+quiz.length+' 題</p>'+
+    '<div class="quiz-q">'+q.q+'</div>'+
+    q.opts.map((o,i)=>'<button class="opt" onclick="pick(this,'+i+')">'+o+'</button>').join('');
+}
+function pick(btn,i){
+  const q=quiz[qi];
+  document.querySelectorAll('.opt').forEach((b,j)=>{
+    b.disabled=true;
+    if(j===q.a)b.classList.add('correct');
+    else if(j===i)b.classList.add('wrong');
+  });
+  if(i===q.a)score++;
+  setTimeout(()=>{qi++;renderQ();},900);
+}
+</script>
+</body>
+</html>
